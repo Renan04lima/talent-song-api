@@ -8,10 +8,25 @@ import { faker } from '@faker-js/faker'
 describe('CreateSongController', () => {
   let sut: CreateSongController
   let createSongSpy: MockProxy<CreateSong>
+  let fakeRequest: CreateSongController.Input
+  let fakeSong: CreateSong.Output
 
   beforeAll(() => {
     createSongSpy = mock()
     sut = new CreateSongController(createSongSpy)
+    fakeSong = {
+      favoriteId: 'any_id',
+      album: 'any_album',
+      artist: 'any_artist',
+      songName: 'any_songName'
+    }
+    fakeRequest = {
+      userId: faker.datatype.uuid(),
+      album: 'any_album',
+      artist: 'any_artist',
+      songName: 'any_songName'
+    }
+    createSongSpy.create.mockResolvedValue(fakeSong)
   })
 
   test('should return 400 if request is invalid', async () => {
@@ -58,5 +73,11 @@ describe('CreateSongController', () => {
       data: new yup.ValidationError('songName is a required field'),
       statusCode: 400
     })
+  })
+
+  test('should call CreateSong with correct input', async () => {
+    await sut.handler(fakeRequest)
+    expect(createSongSpy.create).toHaveBeenCalledWith(fakeRequest)
+    expect(createSongSpy.create).toHaveBeenCalledTimes(1)
   })
 })
