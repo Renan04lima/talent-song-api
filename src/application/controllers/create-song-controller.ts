@@ -17,9 +17,9 @@ export class CreateSongController implements Controller {
         return badRequest(error)
       }
 
-      await this.createSong.create(req)
+      const song = await this.createSong.create(req)
 
-      return created({})
+      return created(song)
     } catch (error) {
       return serverError(error)
     }
