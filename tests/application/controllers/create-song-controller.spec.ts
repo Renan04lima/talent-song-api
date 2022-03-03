@@ -4,6 +4,7 @@ import { mock, MockProxy } from 'jest-mock-extended'
 import { CreateSong } from '@/domain/usecases'
 import { CreateSongController } from '@/application/controllers'
 import { faker } from '@faker-js/faker'
+import { ServerError } from '@/application/errors'
 
 describe('CreateSongController', () => {
   let sut: CreateSongController
@@ -79,5 +80,15 @@ describe('CreateSongController', () => {
     await sut.handler(fakeRequest)
     expect(createSongSpy.create).toHaveBeenCalledWith(fakeRequest)
     expect(createSongSpy.create).toHaveBeenCalledTimes(1)
+  })
+
+  test('should return 500 on infra error', async () => {
+    const error = new Error('infra_error')
+    createSongSpy.create.mockRejectedValueOnce(error)
+    const result = await sut.handler(fakeRequest)
+    expect(result).toEqual({
+      statusCode: 500,
+      data: new ServerError(error)
+    })
   })
 })
