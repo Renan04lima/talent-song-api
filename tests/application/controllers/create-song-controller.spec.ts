@@ -91,4 +91,12 @@ describe('CreateSongController', () => {
       data: new ServerError(error)
     })
   })
+
+  test('should return 201 with valid data', async () => {
+    const result = await sut.handler(fakeRequest)
+    expect(result).toEqual({
+      statusCode: 201,
+      data: fakeSong
+    })
+  })
 })
