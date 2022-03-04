@@ -3,8 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 
 @Entity({ name: 'favorite_songs' })
 export class PgSongs {
-  @PrimaryGeneratedColumn({ name: 'favorite_id' })
-  id!: number
+  @PrimaryGeneratedColumn('uuid', { name: 'favorite_id' })
+  favoriteId!: string
 
   @Column({ name: 'song_name' })
   songName!: string

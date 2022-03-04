@@ -3,8 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 
 @Entity({ name: 'users' })
 export class PgUsers {
-  @PrimaryGeneratedColumn({ name: 'user_id' })
-  id!: number
+  @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
+  id!: string
 
   @Column({ name: 'email' })
   email!: string
