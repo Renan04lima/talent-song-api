@@ -1,3 +1,6 @@
+import { get } from 'env-var'
+
 export default {
-  port: (process.env.PORT != null) || 5050
+  port: get('PORT').default(5050).asPortNumber(),
+  jwtSecret: get('JWT_SECRET').default('ASDFHKA').asString()
 }
