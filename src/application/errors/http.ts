@@ -5,3 +5,10 @@ export class ServerError extends Error {
     this.stack = error?.stack
   }
 }
+
+export class ForbiddenError extends Error {
+  constructor () {
+    super('Access denied')
+    this.name = 'ForbiddenError'
+  }
+}
