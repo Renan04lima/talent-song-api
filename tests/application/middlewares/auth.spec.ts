@@ -41,4 +41,13 @@ describe('AuthMiddleware', () => {
       data: new ForbiddenError()
     })
   })
+
+  test('should return 200 with userId on success', async () => {
+    const httpResponse = await sut.handle({ authorization })
+
+    expect(httpResponse).toEqual({
+      statusCode: 200,
+      data: { userId: 'any_user_id' }
+    })
+  })
 })
