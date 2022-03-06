@@ -1,4 +1,4 @@
-import { forbidden } from '@/application/helpers'
+import { forbidden, ok } from '@/application/helpers'
 import { Middleware } from '@/application/middlewares'
 import * as yup from 'yup'
 
@@ -12,7 +12,9 @@ export class AuthMiddleware implements Middleware {
     try {
       const error = await this.validate({ authorization })
       if (error != null) return forbidden()
-      await this.authorize({ token: authorization })
+      const userId = await this.authorize({ token: authorization })
+
+      return ok({ userId })
     } catch (error) {
       return forbidden()
     }
