@@ -9,9 +9,13 @@ export class AuthMiddleware implements Middleware {
   constructor (private readonly authorize: Authorize) {}
 
   async handle ({ authorization }: Request): Promise<any> {
-    const error = await this.validate({ authorization })
-    if (error != null) return forbidden()
-    await this.authorize({ token: authorization })
+    try {
+      const error = await this.validate({ authorization })
+      if (error != null) return forbidden()
+      await this.authorize({ token: authorization })
+    } catch (error) {
+      return forbidden()
+    }
   }
 
   private async validate (request: Request): Promise<unknown | undefined> {
