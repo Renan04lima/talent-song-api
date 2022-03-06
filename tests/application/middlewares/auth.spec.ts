@@ -31,4 +31,14 @@ describe('AuthMiddleware', () => {
       token: authorization
     })
   })
+
+  test('should return 403 if Authorize throws', async () => {
+    authorizeSpy.mockRejectedValueOnce(new Error())
+    const result = await sut.handle({ authorization })
+
+    expect(result).toEqual({
+      statusCode: 403,
+      data: new ForbiddenError()
+    })
+  })
 })
