@@ -7,6 +7,7 @@ import { sign } from 'jsonwebtoken'
 import request from 'supertest'
 import { makeFakeDb } from '@/tests/infra/repos/postgres/mocks/connection'
 import { PgUsers } from '@/infra/repos/postgres/entities'
+import { PgFavoriteSongsRepo } from '@/infra/repos/postgres'
 
 describe('User Routes', () => {
   let backup: IBackup
@@ -46,6 +47,40 @@ describe('User Routes', () => {
       expect(status).toBe(201)
       expect(body).toHaveProperty('favoriteId')
       expect(body).toMatchObject({
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+    })
+  })
+
+  describe('GET /favorite-songs', () => {
+    it('should return 403 if authorization header is not present', async () => {
+      const { status } = await request(app)
+        .get('/favorite-songs')
+
+      expect(status).toBe(403)
+    })
+
+    it('should return 200 with valid data', async () => {
+      const { id } = await pgUserRepo.save({ email: 'any_email', password: 'any_password' })
+      const songsRepo = new PgFavoriteSongsRepo()
+      const { favoriteId } = await songsRepo.create({
+        userId: id,
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+      const authorization = sign({ key: id }, env.jwtSecret)
+
+      const { status, body } = await request(app)
+        .get('/favorite-songs?album=any_album')
+        .set({ authorization })
+
+      expect(status).toBe(200)
+      expect(body).toHaveLength(1)
+      expect(body[0]).toEqual({
+        favoriteId,
         songName: 'any_songName',
         artist: 'any_artist',
         album: 'any_album'
