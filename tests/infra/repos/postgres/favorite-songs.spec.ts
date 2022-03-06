@@ -39,4 +39,30 @@ describe('PgFavoriteSongsRepo', () => {
       })
     })
   })
+
+  describe('get', () => {
+    it('should find all user songs', async () => {
+      const user = await pgUserRepo.save({ email: 'any_email', password: 'any_password' })
+      const song = await sut.create({
+        userId: user.id,
+        songName: 'any_songName_1',
+        artist: 'any_artist_1',
+        album: 'any_album_1'
+      })
+      const song2 = await sut.create({
+        userId: user.id,
+        songName: 'any_songName_2',
+        artist: 'any_artist_2',
+        album: 'any_album_2'
+      })
+
+      const result = await sut.get({
+        userId: user.id
+      })
+
+      expect(result).toHaveLength(2)
+      expect(result[0].favoriteId).toBe(song.favoriteId)
+      expect(result[1].favoriteId).toBe(song2.favoriteId)
+    })
+  })
 })
