@@ -1,21 +1,18 @@
 
-import { GetSongs } from '@/domain/usecases'
 import { GetSongsController } from '@/application/controllers'
 import { ServerError } from '@/application/errors'
 
 import * as yup from 'yup'
-import { mock, MockProxy } from 'jest-mock-extended'
 import { faker } from '@faker-js/faker'
 
 describe('GetSongsController', () => {
   let sut: GetSongsController
-  let getSongsSpy: MockProxy<GetSongs>
-  let fakeRequest: GetSongsController.Input
-  let fakeSongs: GetSongs.Output
+  let getSongsSpy: jest.Mock
+  let fakeRequest: { userId: string, songName?: string, artist?: string, album?: string }
+  let fakeSongs: Array<{ favoriteId: string, songName: string, artist: string, album: string }>
 
   beforeAll(() => {
-    getSongsSpy = mock()
-    sut = new GetSongsController(getSongsSpy)
+    getSongsSpy = jest.fn()
     fakeSongs = [{
       favoriteId: 'any_id',
       album: 'any_album',
@@ -28,7 +25,11 @@ describe('GetSongsController', () => {
       artist: 'any_artist',
       songName: 'any_songName'
     }
-    getSongsSpy.get.mockResolvedValue(fakeSongs)
+  })
+
+  beforeEach(() => {
+    sut = new GetSongsController(getSongsSpy)
+    getSongsSpy.mockResolvedValue(fakeSongs)
   })
 
   test('should return 400 if request is invalid', async () => {
@@ -46,36 +47,36 @@ describe('GetSongsController', () => {
       userId: faker.datatype.uuid()
     }
     await sut.handler(onlyUserId)
-    expect(getSongsSpy.get).toHaveBeenCalledWith(onlyUserId)
+    expect(getSongsSpy).toHaveBeenCalledWith(onlyUserId)
 
     const withAlbum = {
       album: 'any_album',
       userId: faker.datatype.uuid()
     }
     await sut.handler(withAlbum)
-    expect(getSongsSpy.get).toHaveBeenCalledWith(withAlbum)
+    expect(getSongsSpy).toHaveBeenCalledWith(withAlbum)
 
     const withArtist = {
       artist: 'any_artist',
       userId: faker.datatype.uuid()
     }
     await sut.handler(withArtist)
-    expect(getSongsSpy.get).toHaveBeenCalledWith(withArtist)
+    expect(getSongsSpy).toHaveBeenCalledWith(withArtist)
 
     const withSongName = {
       songName: 'any_songName',
       userId: faker.datatype.uuid()
     }
     await sut.handler(withSongName)
-    expect(getSongsSpy.get).toHaveBeenCalledWith(withSongName)
+    expect(getSongsSpy).toHaveBeenCalledWith(withSongName)
 
     await sut.handler(fakeRequest)
-    expect(getSongsSpy.get).toHaveBeenCalledWith(fakeRequest)
+    expect(getSongsSpy).toHaveBeenCalledWith(fakeRequest)
   })
 
   test('should return 500 on infra error', async () => {
     const error = new Error('infra_error')
-    getSongsSpy.get.mockRejectedValueOnce(error)
+    getSongsSpy.mockRejectedValueOnce(error)
     const result = await sut.handler(fakeRequest)
     expect(result).toEqual({
       statusCode: 500,

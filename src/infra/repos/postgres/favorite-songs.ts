@@ -1,10 +1,10 @@
-import { CreateSong, GetSongs } from '@/domain/usecases'
+import { CreateSongRepo, GetSongsRepo } from '@/domain/contracts/repos'
 import { PgSongs } from '@/infra/repos/postgres/entities'
 import _ from 'lodash'
 import { getRepository } from 'typeorm'
 
-export class PgFavoriteSongsRepo implements CreateSong, GetSongs {
-  async create (input: CreateSong.Input): Promise<CreateSong.Output> {
+export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo {
+  async create (input: CreateSongRepo.Input): Promise<CreateSongRepo.Output> {
     const repo = getRepository(PgSongs)
     const { album, artist, favoriteId, songName } = await repo.save(input)
     return {
@@ -12,7 +12,7 @@ export class PgFavoriteSongsRepo implements CreateSong, GetSongs {
     }
   }
 
-  async get (input: GetSongs.Input): Promise<GetSongs.Output> {
+  async get (input: GetSongsRepo.Input): Promise<GetSongsRepo.Output> {
     const repo = getRepository(PgSongs)
     const cleanedInput = _.pickBy(input)
     const songs = await repo.find({

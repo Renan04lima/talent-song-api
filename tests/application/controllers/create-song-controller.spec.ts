@@ -1,20 +1,18 @@
 
-import * as yup from 'yup'
-import { mock, MockProxy } from 'jest-mock-extended'
-import { CreateSong } from '@/domain/usecases'
 import { CreateSongController } from '@/application/controllers'
-import { faker } from '@faker-js/faker'
 import { ServerError } from '@/application/errors'
+
+import { faker } from '@faker-js/faker'
+import * as yup from 'yup'
 
 describe('CreateSongController', () => {
   let sut: CreateSongController
-  let createSongSpy: MockProxy<CreateSong>
-  let fakeRequest: CreateSongController.Input
-  let fakeSong: CreateSong.Output
+  let createSongSpy: jest.Mock
+  let fakeRequest: { userId: string, songName: string, artist: string, album: string }
+  let fakeSong: { favoriteId: string, songName: string, artist: string, album: string }
 
   beforeAll(() => {
-    createSongSpy = mock()
-    sut = new CreateSongController(createSongSpy)
+    createSongSpy = jest.fn()
     fakeSong = {
       favoriteId: 'any_id',
       album: 'any_album',
@@ -27,7 +25,11 @@ describe('CreateSongController', () => {
       artist: 'any_artist',
       songName: 'any_songName'
     }
-    createSongSpy.create.mockResolvedValue(fakeSong)
+  })
+
+  beforeEach(() => {
+    sut = new CreateSongController(createSongSpy)
+    createSongSpy.mockResolvedValue(fakeSong)
   })
 
   test('should return 400 if request is invalid', async () => {
@@ -78,13 +80,13 @@ describe('CreateSongController', () => {
 
   test('should call CreateSong with correct input', async () => {
     await sut.handler(fakeRequest)
-    expect(createSongSpy.create).toHaveBeenCalledWith(fakeRequest)
-    expect(createSongSpy.create).toHaveBeenCalledTimes(1)
+    expect(createSongSpy).toHaveBeenCalledWith(fakeRequest)
+    expect(createSongSpy).toHaveBeenCalledTimes(1)
   })
 
   test('should return 500 on infra error', async () => {
     const error = new Error('infra_error')
-    createSongSpy.create.mockRejectedValueOnce(error)
+    createSongSpy.mockRejectedValueOnce(error)
     const result = await sut.handler(fakeRequest)
     expect(result).toEqual({
       statusCode: 500,

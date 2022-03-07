@@ -3,7 +3,7 @@ import { badRequest, Controller, HttpResponse, serverError, ok } from '@/applica
 import { UpdateSong } from '@/domain/usecases'
 import * as yup from 'yup'
 
-type Request = UpdateSongController.Input
+type Request = { userId: string, favoriteId: string, songName?: string, artist?: string, album?: string }
 
 export class UpdateSongController implements Controller {
   constructor (
@@ -13,11 +13,8 @@ export class UpdateSongController implements Controller {
   async handler (req: Request): Promise<HttpResponse> {
     try {
       const error = await this.validate(req)
-      if (error != null) {
-        return badRequest(error)
-      }
-
-      const song = await this.updateSong.update(req)
+      if (error != null) return badRequest(error)
+      const song = await this.updateSong(req)
 
       return ok(song)
     } catch (error) {
@@ -41,8 +38,4 @@ export class UpdateSongController implements Controller {
       return error
     }
   }
-}
-
-export namespace UpdateSongController {
-  export type Input = UpdateSong.Input
 }

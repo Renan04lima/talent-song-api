@@ -1,10 +1,10 @@
 
 import { badRequest, Controller, created, HttpResponse, serverError } from '@/application/helpers'
-import { CreateSong } from '@/domain/usecases'
 import * as yup from 'yup'
 
-type Request = CreateSongController.Input
-
+type Request = { userId: string, songName: string, artist: string, album: string }
+type Model = { favoriteId: string, songName: string, artist: string, album: string }
+type CreateSong = (request: Request) => Promise<Model>
 export class CreateSongController implements Controller {
   constructor (
     private readonly createSong: CreateSong
@@ -13,11 +13,8 @@ export class CreateSongController implements Controller {
   async handler (req: Request): Promise<HttpResponse> {
     try {
       const error = await this.validate(req)
-      if (error != null) {
-        return badRequest(error)
-      }
-
-      const song = await this.createSong.create(req)
+      if (error != null) return badRequest(error)
+      const song = await this.createSong(req)
 
       return created(song)
     } catch (error) {
@@ -40,8 +37,4 @@ export class CreateSongController implements Controller {
       return error
     }
   }
-}
-
-export namespace CreateSongController {
-  export type Input = CreateSong.Input
 }

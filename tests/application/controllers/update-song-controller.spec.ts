@@ -1,21 +1,18 @@
 
-import { UpdateSong } from '@/domain/usecases'
 import { UpdateSongController } from '@/application/controllers'
 import { ServerError } from '@/application/errors'
 
 import * as yup from 'yup'
-import { mock, MockProxy } from 'jest-mock-extended'
 import { faker } from '@faker-js/faker'
 
 describe('UpdateSongController', () => {
   let sut: UpdateSongController
-  let updateSongSpy: MockProxy<UpdateSong>
-  let fakeRequest: UpdateSongController.Input
-  let fakeSong: UpdateSong.Output
+  let updateSongSpy: jest.Mock
+  let fakeRequest: { userId: string, favoriteId: string, songName?: string, artist?: string, album?: string }
+  let fakeSong: { songName: string, artist: string, album: string}
 
   beforeAll(() => {
-    updateSongSpy = mock()
-    sut = new UpdateSongController(updateSongSpy)
+    updateSongSpy = jest.fn()
     fakeSong = {
       album: 'any_album',
       artist: 'any_artist',
@@ -28,7 +25,11 @@ describe('UpdateSongController', () => {
       artist: 'any_artist',
       songName: 'any_songName'
     }
-    updateSongSpy.update.mockResolvedValue(fakeSong)
+  })
+
+  beforeEach(() => {
+    sut = new UpdateSongController(updateSongSpy)
+    updateSongSpy.mockResolvedValue(fakeSong)
   })
 
   test('should return 400 if request is invalid', async () => {
@@ -59,13 +60,13 @@ describe('UpdateSongController', () => {
 
   test('should call UpdateSong with correct input', async () => {
     await sut.handler(fakeRequest)
-    expect(updateSongSpy.update).toHaveBeenCalledWith(fakeRequest)
-    expect(updateSongSpy.update).toHaveBeenCalledTimes(1)
+    expect(updateSongSpy).toHaveBeenCalledWith(fakeRequest)
+    expect(updateSongSpy).toHaveBeenCalledTimes(1)
   })
 
   test('should return 500 on infra error', async () => {
     const error = new Error('infra_error')
-    updateSongSpy.update.mockRejectedValueOnce(error)
+    updateSongSpy.mockRejectedValueOnce(error)
     const result = await sut.handler(fakeRequest)
     expect(result).toEqual({
       statusCode: 500,

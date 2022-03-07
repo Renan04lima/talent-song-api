@@ -1,19 +1,11 @@
-export interface UpdateSong {
-  update: (input: UpdateSong.Input) => Promise<UpdateSong.Output>
-}
+import { UpdateSongRepo } from '@/domain/contracts/repos'
 
-export namespace UpdateSong {
-  export type Input = {
-    userId: string
-    favoriteId: string
-    songName?: string
-    artist?: string
-    album?: string
-  }
+type Input = { userId: string, favoriteId: string, songName?: string, artist?: string, album?: string }
+type Output = { songName: string, artist: string, album: string}
+type Setup = (updateSongRepo: UpdateSongRepo) => UpdateSong
+export type UpdateSong = (input: Input) => Promise<Output>
 
-  export type Output = {
-    songName: string
-    artist: string
-    album: string
-  }
+export const setupUpdateSong: Setup = (updateSongRepo) => async input => {
+  const songs = await updateSongRepo.update(input)
+  return songs
 }
