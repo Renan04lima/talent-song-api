@@ -123,4 +123,36 @@ describe('User Routes', () => {
       })
     })
   })
+
+  describe('DELETE /favorite-songs', () => {
+    it('should return 403 if authorization header is not present', async () => {
+      const { status } = await request(app)
+        .delete('/favorite-songs/any_id')
+
+      expect(status).toBe(403)
+    })
+
+    it('should return 200 with valid data', async () => {
+      const { id } = await pgUserRepo.save({ email: 'any_email', password: 'any_password' })
+      const authorization = sign({ key: id }, env.jwtSecret)
+      const songsRepo = new PgFavoriteSongsRepo()
+      const { favoriteId } = await songsRepo.create({
+        userId: id,
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+      const { status, body } = await request(app)
+        .delete(`/favorite-songs/${favoriteId}`)
+        .set({ authorization })
+        .send({
+          songName: 'songName_updated',
+          artist: 'artist_updated',
+          album: 'album_updated'
+        })
+
+      expect(status).toBe(204)
+      expect(body).toEqual({})
+    })
+  })
 })
