@@ -57,3 +57,14 @@ export namespace UpdateSongRepo {
     album: string
   }
 }
+
+export interface SongBelongToTheUserRepo {
+  belong: (input: SongBelongToTheUserRepo.Input) => Promise<boolean>
+}
+
+export namespace SongBelongToTheUserRepo {
+  export type Input = {
+    userId: string
+    favoriteId: string
+  }
+}
