@@ -159,4 +159,30 @@ describe('PgFavoriteSongsRepo', () => {
       expect(belongs2).toBeFalsy()
     })
   })
+
+  describe('update', () => {
+    it('should allow a user update a favorite song', async () => {
+      const user = await pgUserRepo.save({ email: 'any_email', password: 'any_password' })
+      const { favoriteId } = await sut.create({
+        userId: user.id,
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+
+      const songUpdated = await sut.update({
+        userId: user.id,
+        favoriteId,
+        album: 'album_updated',
+        artist: 'artist_updated',
+        songName: 'songName_updated'
+      })
+
+      expect(songUpdated).toMatchObject({
+        album: 'album_updated',
+        artist: 'artist_updated',
+        songName: 'songName_updated'
+      })
+    })
+  })
 })
