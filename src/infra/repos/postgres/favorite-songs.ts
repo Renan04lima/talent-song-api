@@ -1,9 +1,9 @@
-import { CreateSongRepo, GetSongsRepo } from '@/domain/contracts/repos'
+import { CreateSongRepo, GetSongsRepo, SongBelongToTheUserRepo } from '@/domain/contracts/repos'
 import { PgSongs } from '@/infra/repos/postgres/entities'
 import _ from 'lodash'
 import { getRepository } from 'typeorm'
 
-export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo {
+export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo, SongBelongToTheUserRepo {
   async create (input: CreateSongRepo.Input): Promise<CreateSongRepo.Output> {
     const repo = getRepository(PgSongs)
     const { album, artist, favoriteId, songName } = await repo.save(input)
@@ -20,5 +20,11 @@ export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo {
       where: cleanedInput
     })
     return songs
+  }
+
+  async belong ({ userId, favoriteId }: SongBelongToTheUserRepo.Input): Promise<boolean> {
+    const repo = getRepository(PgSongs)
+    const belogs = await repo.findOne({ where: { userId, favoriteId } })
+    return !(belogs == null)
   }
 }
