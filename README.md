@@ -43,6 +43,7 @@ Para isso, o sistema precisa de uma feature de autenticação também, pois os u
 ![MODELAGEM](./talent-song-api-test-modelagem.png)
 ## Documentação das rotas
 
+  Para acessar as rotas que o usuário tem que estar autenticado é necessário passa o header `Authorization: <JWT TOKEN>` nas requisições.
 
 ### **POST /login**
 
