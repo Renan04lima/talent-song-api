@@ -135,4 +135,28 @@ describe('PgFavoriteSongsRepo', () => {
       expect(allProperties[0].favoriteId).toBe(song2.favoriteId)
     })
   })
+
+  describe('belong', () => {
+    it('should check if the song belogs to the user', async () => {
+      const user = await pgUserRepo.save({ email: 'any_email', password: 'any_password' })
+      const { favoriteId } = await sut.create({
+        userId: user.id,
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+      const belongs = await sut.belong({ userId: user.id, favoriteId })
+      expect(belongs).toBeTruthy()
+
+      const user2 = await pgUserRepo.save({ email: 'any_email_2', password: 'any_password' })
+      await sut.create({
+        userId: user2.id,
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+      const belongs2 = await sut.belong({ userId: user2.id, favoriteId })
+      expect(belongs2).toBeFalsy()
+    })
+  })
 })
