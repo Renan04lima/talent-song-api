@@ -1,5 +1,5 @@
 import { UpdateSongRepo, SongBelongToTheUserRepo } from '@/domain/contracts/repos'
-import { NotBelogsError } from '@/application/errors/not-belongs'
+import { NotBelogsError } from '@/application/errors'
 
 type Input = { userId: string, favoriteId: string, songName?: string, artist?: string, album?: string }
 type Output = { songName: string, artist: string, album: string}
