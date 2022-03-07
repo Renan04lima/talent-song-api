@@ -1,5 +1,6 @@
 
-import { badRequest, Controller, HttpResponse, serverError, ok } from '@/application/helpers'
+import { badRequest, Controller, HttpResponse, serverError, ok, forbidden } from '@/application/helpers'
+import { NotBelogsError } from '@/application/errors'
 import { UpdateSong } from '@/domain/usecases'
 import * as yup from 'yup'
 
@@ -18,6 +19,7 @@ export class UpdateSongController implements Controller {
 
       return ok(song)
     } catch (error) {
+      if (error instanceof NotBelogsError) { return forbidden() }
       return serverError(error)
     }
   }
