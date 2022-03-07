@@ -19,6 +19,10 @@ export const created = <T = any> (data: T): HttpResponse<T> => ({
   data
 })
 
+export const noContent = (): HttpResponse => ({
+  statusCode: 204
+})
+
 export const badRequest = (error: unknown): HttpResponse<Error> => ({
   statusCode: 400,
   data: error instanceof Error ? error : undefined

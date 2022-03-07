@@ -1,5 +1,5 @@
 
-import { badRequest, Controller, HttpResponse, ok, serverError } from '@/application/helpers'
+import { badRequest, Controller, HttpResponse, noContent, ok, serverError } from '@/application/helpers'
 import * as yup from 'yup'
 
 type Request = { userId: string, songName?: string, artist?: string, album?: string }
@@ -16,7 +16,7 @@ export class GetSongsController implements Controller {
       if (error != null) return badRequest(error)
       const songs = await this.getSongs(req)
 
-      return ok(songs)
+      return (songs.length > 0) ? ok(songs) : noContent()
     } catch (error) {
       return serverError(error)
     }
