@@ -84,6 +84,14 @@ describe('GetSongsController', () => {
     })
   })
 
+  test('should return 204 if GetSongs return a empty array', async () => {
+    getSongsSpy.mockResolvedValueOnce([])
+    const result = await sut.handler(fakeRequest)
+    expect(result).toEqual({
+      statusCode: 204
+    })
+  })
+
   test('should return 200 with valid data', async () => {
     const result = await sut.handler(fakeRequest)
     expect(result).toEqual({
