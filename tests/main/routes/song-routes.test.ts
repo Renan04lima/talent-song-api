@@ -9,7 +9,7 @@ import { makeFakeDb } from '@/tests/infra/repos/postgres/mocks/connection'
 import { PgUsers } from '@/infra/repos/postgres/entities'
 import { PgFavoriteSongsRepo } from '@/infra/repos/postgres'
 
-describe('User Routes', () => {
+describe('Song Routes', () => {
   let backup: IBackup
   let pgUserRepo: Repository<PgUsers>
 
