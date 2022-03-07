@@ -1,9 +1,9 @@
-import { CreateSongRepo, GetSongsRepo, SongBelongToTheUserRepo, UpdateSongRepo } from '@/domain/contracts/repos'
+import { CreateSongRepo, DeleteSongRepo, GetSongsRepo, SongBelongToTheUserRepo, UpdateSongRepo } from '@/domain/contracts/repos'
 import { PgSongs } from '@/infra/repos/postgres/entities'
 import _ from 'lodash'
 import { getRepository } from 'typeorm'
 
-export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo, SongBelongToTheUserRepo, UpdateSongRepo {
+export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo, SongBelongToTheUserRepo, UpdateSongRepo, DeleteSongRepo {
   async create (input: CreateSongRepo.Input): Promise<CreateSongRepo.Output> {
     const repo = getRepository(PgSongs)
     const { album, artist, favoriteId, songName } = await repo.save(input)
@@ -40,5 +40,10 @@ export class PgFavoriteSongsRepo implements CreateSongRepo, GetSongsRepo, SongBe
       artist: song.artist,
       songName: song.songName
     }
+  }
+
+  async delete ({ favoriteId }: DeleteSongRepo.Input): Promise<void> {
+    const repo = getRepository(PgSongs)
+    await repo.delete(favoriteId)
   }
 }
