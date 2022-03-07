@@ -68,3 +68,14 @@ export namespace SongBelongToTheUserRepo {
     favoriteId: string
   }
 }
+
+export interface DeleteSongRepo {
+  delete: (input: DeleteSongRepo.Input) => Promise<void>
+}
+
+export namespace DeleteSongRepo {
+  export type Input = {
+    userId: string
+    favoriteId: string
+  }
+}
