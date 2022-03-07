@@ -1,6 +1,6 @@
 
 import { UpdateSongController } from '@/application/controllers'
-import { ServerError } from '@/application/errors'
+import { ForbiddenError, ServerError, NotBelogsError } from '@/application/errors'
 
 import * as yup from 'yup'
 import { faker } from '@faker-js/faker'
@@ -71,6 +71,16 @@ describe('UpdateSongController', () => {
     expect(result).toEqual({
       statusCode: 500,
       data: new ServerError(error)
+    })
+  })
+
+  test('should return 403 if UpdateSong throw NotBelogsError', async () => {
+    const error = new NotBelogsError()
+    updateSongSpy.mockRejectedValueOnce(error)
+    const result = await sut.handler(fakeRequest)
+    expect(result).toEqual({
+      statusCode: 403,
+      data: new ForbiddenError()
     })
   })
 
