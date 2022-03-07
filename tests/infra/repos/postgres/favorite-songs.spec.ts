@@ -1,5 +1,5 @@
 import { PgFavoriteSongsRepo } from '@/infra/repos/postgres'
-import { PgUsers } from '@/infra/repos/postgres/entities'
+import { PgSongs, PgUsers } from '@/infra/repos/postgres/entities'
 import { makeFakeDb } from '@/tests/infra/repos/postgres/mocks/connection'
 
 import { IBackup } from 'pg-mem'
@@ -8,11 +8,13 @@ import { getRepository, Repository } from 'typeorm'
 describe('PgFavoriteSongsRepo', () => {
   let sut: PgFavoriteSongsRepo
   let pgUserRepo: Repository<PgUsers>
+  let pgSongRepo: Repository<PgSongs>
   let backup: IBackup
 
   beforeAll(async () => {
     const db = await makeFakeDb()
     pgUserRepo = getRepository(PgUsers)
+    pgSongRepo = getRepository(PgSongs)
     backup = db.backup()
   })
 
@@ -183,6 +185,26 @@ describe('PgFavoriteSongsRepo', () => {
         artist: 'artist_updated',
         songName: 'songName_updated'
       })
+    })
+  })
+
+  describe('delete', () => {
+    it('should allow a user delete a favorite song', async () => {
+      const user = await pgUserRepo.save({ email: 'any_email', password: 'any_password' })
+      const { favoriteId } = await sut.create({
+        userId: user.id,
+        songName: 'any_songName',
+        artist: 'any_artist',
+        album: 'any_album'
+      })
+      const song = await sut.delete({
+        userId: user.id,
+        favoriteId
+      })
+      expect(song).toBeUndefined()
+
+      const exists = await pgSongRepo.findOne(favoriteId)
+      expect(exists).toBeUndefined()
     })
   })
 })
